@@ -13,7 +13,7 @@
                 <button type="button" class="btn btn-primary" onclick="show()">Show</button>
 
                 <form>
-                    <input class="form-control" type="string" id="recipient" placeholder="recipient">
+                    <input class="form-control" type="string" id="recipientAddress" placeholder="recipientAddress">
                     <input class="form-control" type="string" id="recipientAmount" placeholder="recipientAmount">
                 </form>
                 <button type="button" class="btn btn-primary" onclick="sendTokenClicked()">Send</button>
@@ -44,8 +44,16 @@
         }
 
         function sendTokenClicked() {
-            window.sendToken();
-        }        
+            var pinCode = document.getElementById("pinCode").value;
+            var recipientAddress = document.getElementById("recipientAddress").value;
+            var recipientAmount = document.getElementById("recipientAmount").value;
+            window.sendToken(pinCode,recipientAddress,recipientAmount, "1");
+        }   
+        
+        function defaultWalletClicked(index) {
+            var pinCode = document.getElementById("pinCode").value;
+            window.defaultWallet(pinCode, index);
+        }           
 
         function show() {
             var wallets = JSON.parse(localStorage.getItem('wallets'))
@@ -53,7 +61,9 @@
             for (var i = 0; i < wallets.length; i++) {
                 var row = table.insertRow(-1);
                 var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(-1);
                 cell1.innerHTML = wallets[i];
+                cell2.innerHTML = '<button onclick="defaultWalletClicked(' + i + ')">Default</button>';
             }
 
         }
