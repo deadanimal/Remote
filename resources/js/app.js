@@ -21,7 +21,6 @@ window.generateWallet = async function generateWallet(pinCode) {
         var walletsStringified = bytes.toString(CryptoJS.enc.Utf8); 
         var wallets = JSON.parse(walletsStringified);   
         if(wallets.length > 20) {
-            console.log('KO');
             return;
         }               
     } else {
@@ -60,7 +59,6 @@ window.importWallet = async function importWallet(pinCode, mnemonic) {
         var walletsStringified = bytes.toString(CryptoJS.enc.Utf8); 
         var wallets = JSON.parse(walletsStringified);          
         if(wallets.length > 20) {
-            console.log('KO');
             return;
         }          
     } else {
@@ -103,27 +101,34 @@ window.showMnemonic = async function showMnemonic(pinCode, index) {
     return mnemonic;
 }
 
-window.balanceOfWallet = async function balanceOfWallet(pinCode, rpcEndpoint) {
-    var ciphertext = localStorage.getItem('default_wallet_mnemonic');
+window.balanceOfWallet = async function balanceOfWallet(pinCode) {
+
+    var ciphertext = localStorage.getItem('wallet_mnemonics');
     var bytes  = CryptoJS.AES.decrypt(ciphertext, pinCode);
     var originalText = bytes.toString(CryptoJS.enc.Utf8);    
-    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(originalText);    
-    const client = await StargateClient.connect(rpcEndpoint)
-    const [firstAccount] = await wallet.getAccounts();
-    const [balances] = await client.getAllBalances(firstAccount.address);
-    return balances;
+    var wallets = JSON.parse(originalText); 
+    var balances = [];
+    
+    for (let i = 0; i < wallets.length; i++) {
+        var walletOne = await DirectSecp256k1HdWallet.fromMnemonic(wallets[i]);       
+        const [firstAccount] = await walletOne.getAccounts();
+        const client = await SigningStargateClient.connectWithSigner("178.128.218.199:26657", walletOne);
+        const before = await client.getBalance(firstAccount.address, "udollar");        
+        balances.push(before['amount'])
+    }      
+    localStorage.setItem('wallet_balances', JSON.stringify(balances));
 
 }
 
-window.sendToken = async function sendToken(pinCode, recipient, amount, fee) {
-    var ciphertext = localStorage.getItem('default_wallet');
+window.sendToken = async function sendToken(pinCode, recipient, amount, fee, memo) {
+    var ciphertext = localStorage.getItem('default_wallet_mnemonic');
     var bytes  = CryptoJS.AES.decrypt(ciphertext, pinCode);
     var originalText = bytes.toString(CryptoJS.enc.Utf8);    
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(originalText);    
     const [firstAccount] = await wallet.getAccounts();
     console.log(firstAccount.address);    
 
-    const client = await SigningStargateClient.connectWithSigner("rpc.atomicmoney.org", wallet);
+    const client = await SigningStargateClient.connectWithSigner("178.128.218.199:26657", wallet);
     const before = await client.getBalance(firstAccount.address, "udollar");
     console.log(before);
 
@@ -135,6 +140,7 @@ window.sendToken = async function sendToken(pinCode, recipient, amount, fee) {
             amount: [{ denom: "udollar", amount: fee }],
             gas: "100000",
         },
+        memo
     )   
     console.log(result) 
 }
