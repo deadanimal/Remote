@@ -1,38 +1,63 @@
 @extends('layouts.app')
 
 @section('content')
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-<h3>Wallet</h3>
-<ul>
-    @foreach($wallets as $wallet)
-        <li>{{$wallet->name}} {{$wallet->primary}}</li>
-    @endforeach
-</ul>
+    <div class="row my-3">
+        <div class="col-xl-3">
+            <h3>Wallet
+                <form>
+                    <input class="form-control" type="string" id="pinCode">
+                </form>
+                <button type="button" class="btn btn-primary" onclick="generateWalletClicked()">Create</button>
+                <button type="button" class="btn btn-primary" onclick="show()">Show</button>
 
-<h3>Chain</h3>
-<ul>
-    @foreach($chains as $chain)
-        <li>{{$chain->name}} {{$chain->rpc}}</li>
-    @endforeach
-</ul>
+                <form>
+                    <input class="form-control" type="string" id="recipient" placeholder="recipient">
+                    <input class="form-control" type="string" id="recipientAmount" placeholder="recipientAmount">
+                </form>
+                <button type="button" class="btn btn-primary" onclick="sendTokenClicked()">Send</button>
+            </h3>
+        </div>
+        <div class="col-xl-9">
+            <ul>
+                @foreach ($wallets as $wallet)
+                    <li>{{ $wallet->name }} {{ $wallet->primary }} <a href="/wallet/{{ $wallet->id }}">View</a></li>
+                @endforeach
+            </ul>
 
-<form action='/wallet' method="POST">
-    @csrf
-    <button type="submit" class="btn btn-primary">Create</button>
-</form>
+            <table id="table" class="table">
+                <thead>
+                    <tr>
+                        <th data-field="address">address</th>
 
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <script src="/js/app.js"></script>
+    <script>
+        function generateWalletClicked() {
+            var pinCode = document.getElementById("pinCode").value;
+            window.generateWallet(pinCode);
+        }
 
-<form action='/chain' method="POST">
-    @csrf
-    <input class="form-control" name="name">
-    <input class="form-control" name="rpc">
-    <button type="submit" class="btn btn-primary">Create</button>
-</form>
+        function sendTokenClicked() {
+            window.sendToken();
+        }        
 
+        function show() {
+            var wallets = JSON.parse(localStorage.getItem('wallets'))
+            var table = document.getElementById("table");
+            for (var i = 0; i < wallets.length; i++) {
+                var row = table.insertRow(-1);
+                var cell1 = row.insertCell(0);
+                cell1.innerHTML = wallets[i];
+            }
 
-<form>
-    <input class="form-control" placeholder="receiver" name="receiver">
-    <input class="form-control" placeholder="amount" name="amount">
-    <button type="button" class="btn btn-primary">Send</button>
-</form>
+        }
+
+        show();
+    </script>
 @endsection

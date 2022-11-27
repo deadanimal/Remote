@@ -32,15 +32,18 @@
 
             <div class="collapse navbar-collapse" id="navbarColor01">
                 <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chain">Chain</a>
+                    </li>
                     {{-- <li class="nav-item">
-                        <a class="nav-link" href="/match">Match</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/team">Team</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/player">Player</a>
+                        <a class="nav-link" href="/transaction">transaction</a>
                     </li> --}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/transfer">Transfer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/wallet">Wallet</a>
+                    </li>                    
                     {{-- <li class="nav-item">
                         <a class="nav-link" href="#">About</a>
                     </li>

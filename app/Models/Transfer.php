@@ -14,6 +14,7 @@ class Transfer extends Model
         'amount',
         'denom',
         'sequence',
+        'hash',
         'chain_id',
         'wallet_id',
         'user_id'
